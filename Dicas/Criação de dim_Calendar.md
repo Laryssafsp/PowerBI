@@ -1,4 +1,5 @@
 ## Linguagem M
+```
 let
     // Parâmetros de entrada
     Fonte = Consulta,  // Substitua 'Consulta' pelo nome da consulta de origem ou variável de dados.
@@ -23,8 +24,10 @@ let
     #"Tipo Alterado" = Table.TransformColumnTypes(#"Colunas Renomeadas",{{"Data", type date}})
 in
     #"Tipo Alterado"
+```
 
 
 ## DAX
-
+```
 dCalendario = CALENDAR(MIN(tab[Col_date]),MAX(tab[Col_date]))
+```
