@@ -1,5 +1,7 @@
-## Linguagem M
-```
+### Criação de dim_Calendar
+
+Linguagem M
+```M
 let
     // Parâmetros de entrada
     Fonte = Consulta,  // Substitua 'Consulta' pelo nome da consulta de origem ou variável de dados.
@@ -27,7 +29,34 @@ in
 ```
 
 
-## DAX
-```
+DAX
+```dax
 dCalendario = CALENDAR(MIN(tab[Col_date]),MAX(tab[Col_date]))
+```
+
+### Diferença de Tempo de execução
+
+```dax
+Tempo Execucao(min) =
+var seg = DATEDIFF('tabela' [starttime], 'tabela' [endtime], SECOND)
+var minute = ROUND(seg/60, 2)
+return
+minute
+```
+
+
+### Dia de Semana na Tabela
+```dax
+
+Dia da Semana Nome =
+SWITCH(
+WEEKDAY('tabela'[data], 2),
+1, "Segunda-feira",
+2, "Terça-feira",
+3, "Quarta-feira",
+4, "Quinta-feira",
+5, "Sexta-feira",
+6, "Sábado",
+7, "Domingo"
+)
 ```
