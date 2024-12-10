@@ -358,7 +358,7 @@ RETURN
 #### 3 - Mensagem mostrando todos e filtrando conforme selecionado
 
 ```
-Com mensagem_Evitar_erro_com_filtro = 
+Evitar_erro_com_filtro_sem_titulo = 
 VAR DiaSelecionado = VALUES(tabela1[Dia da Semana])
 var top_N = 5
 
@@ -374,7 +374,8 @@ VAR Segunda_Feira =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Terca_Feira =
@@ -389,7 +390,8 @@ VAR Terca_Feira =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Quarta_Feira =
@@ -404,7 +406,8 @@ VAR Quarta_Feira =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Quinta_Feira =
@@ -419,7 +422,8 @@ VAR Quinta_Feira =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Sexta_Feira =
@@ -434,7 +438,8 @@ VAR Sexta_Feira =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Sabado =
@@ -449,7 +454,8 @@ VAR Sabado =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Domingo =
@@ -464,44 +470,101 @@ VAR Domingo =
                 "Horario", tabela1[Hour_30minutes]
             )
         ),
-        [Horario], ","
+        [Horario], " , ", 
+        [Horario], ASC
     )
 
 VAR Resultado = 
     IF(
-        "Segunda-feira" IN DiaSelecionado,
-        "Nas Segundas-feiras, evite os seguintes horários: " & Segunda_Feira & UNICHAR(10),
-        ""
-    ) &
+        ISFILTERED(tabela1[Dia da Semana]),
+        IF(
+            "Segunda-feira" IN DiaSelecionado,
+            "As Segundas-feiras, evite: " & Segunda_Feira & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Terça-feira" IN DiaSelecionado,
+            "As Terças-feiras, evite: " & Terca_Feira & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Quarta-feira" IN DiaSelecionado,
+            "As Quartas-feiras, evite: " & Quarta_Feira & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Quinta-feira" IN DiaSelecionado,
+            "As Quintas-feiras, evite: " & Quinta_Feira & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Sexta-feira" IN DiaSelecionado,
+            "As Sextas-feiras, evite: " & Sexta_Feira & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Sábado" IN DiaSelecionado,
+            "Aos Sábados, evite: " & Sabado & UNICHAR(10),
+            ""
+        ) &
+        IF(
+            "Domingo" IN DiaSelecionado,
+            "Aos Domingos, evite: " & Domingo & UNICHAR(10),
+            ""
+        )
+        ,"..."
+        --"Selecione os dias para verificar os melhores horários"
+    )
+
+RETURN
+    Resultado
+
+```
+
+---
+
+
+#### 4 - Mensagem mostrando conforme selecionados e horarios distintos
+
+```
+Evitar_erro_com_filtro_sem_titulo = 
+VAR DiaSelecionado = VALUES(tabela1[Dia da Semana])
+VAR top_N = 5
+
+-- Função para concatenar horários distintos para um dia específico
+VAR HorariosDistintos =
+    CONCATENATEX(
+        DISTINCT(
+            SELECTCOLUMNS(
+                FILTER(
+                    tabela1,
+                    tabela1[rank] < top_N &&
+                    tabela1[Dia da Semana] IN DiaSelecionado
+                ),
+                "Horario", tabela1[Hour_30minutes]
+            )
+        ),
+        [Horario], " , ", 
+        [Horario], ASC
+    )
+
+-- Função para formatar os dias selecionados
+VAR DiasFormatados =
+    CONCATENATEX(
+        DiaSelecionado,
+        [Dia da Semana],
+        ", "
+    )
+
+-- Resultado baseado na filtragem
+VAR Resultado = 
     IF(
-        "Terça-feira" IN DiaSelecionado,
-        "Nas Terças-feiras, evite os seguintes horários: " & Terca_Feira & UNICHAR(10),
-        ""
-    ) &
-    IF(
-        "Quarta-feira" IN DiaSelecionado,
-        "Nas Quartas-feiras, evite os seguintes horários: " & Quarta_Feira & UNICHAR(10),
-        ""
-    ) &
-    IF(
-        "Quinta-feira" IN DiaSelecionado,
-        "Nas Quintas-feiras, evite os seguintes horários: " & Quinta_Feira & UNICHAR(10),
-        ""
-    ) &
-    IF(
-        "Sexta-feira" IN DiaSelecionado,
-        "Nas Sextas-feiras, evite os seguintes horários: " & Sexta_Feira & UNICHAR(10),
-        ""
-    ) &
-    IF(
-        "Sábado" IN DiaSelecionado,
-        "Nos Sábados, evite os seguintes horários: " & Sabado & UNICHAR(10),
-        ""
-    ) &
-    IF(
-        "Domingo" IN DiaSelecionado,
-        "Nos Domingos, evite os seguintes horários: " & Domingo & UNICHAR(10),
-        ""
+        -- Se nenhum dia for selecionado
+        NOT ISFILTERED(tabela1[Dia da Semana]),
+        "Selecione os dias para verificar os melhores horários",
+        
+        -- Caso dias sejam filtrados, mostre a mensagem com os horários
+        "Nos dias " & DiasFormatados & ", você deve evitar os horários: " & HorariosDistintos
     )
 
 RETURN
