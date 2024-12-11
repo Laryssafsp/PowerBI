@@ -39,3 +39,33 @@ Configuração da formatação condicional:
 - Defina as regras de cores, por exemplo:
 - Rank 1 a 4: Escolha uma cor chamativa (como verde ou azul).
 - Rank > 4: Escolha uma cor mais neutra (como cinza claro).
+
+
+
+## Destaque com "if" pois o gráfico é realizado a aprtir de parâmetros:
+
+```
+Rank Agendamentos = 
+IF (
+    ISFILTERED(Tabela[horario_1]),  -- Verifica se o filtro está em horario_1
+    RANKX(
+        ALLSELECTED(Tabela[horario_1]),  -- Aplica o rank apenas para os valores de horario_1
+        CALCULATE(SUM(Tabela[qtd_agendamentos])),  -- Soma dos agendamentos
+        , 
+        DESC,  -- Ordenação decrescente
+        Dense  -- Classificação densa
+    ),
+    IF (
+        ISFILTERED(Tabela[horario_30]),  -- Verifica se o filtro está em horario_30
+        RANKX(
+            ALLSELECTED(Tabela[horario_30]),  -- Aplica o rank apenas para os valores de horario_30
+            CALCULATE(SUM(Tabela[qtd_agendamentos])),  -- Soma dos agendamentos
+            , 
+            DESC,  -- Ordenação decrescente
+            Dense  -- Classificação densa
+        ),
+        BLANK()  -- Se nenhum filtro for aplicado, retorna em branco (você pode ajustar isso conforme necessário)
+    )
+)
+
+```
